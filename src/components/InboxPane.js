@@ -46,7 +46,7 @@ export function InboxPane({ emails, status, focused, height, width }) {
       ? h(Text, { color: 'yellow' }, 'loading...')
       : h(Text, { color: 'red' }, 'disconnected');
 
-  const header = h(Box, null,
+  const header = h(Box, { overflow: 'hidden', flexShrink: 0 },
     h(Text, { bold: true, color: focused ? 'cyan' : 'white' }, 'Inbox'),
     h(Text, { color: 'gray' }, ' '),
     headerStatus
@@ -64,10 +64,10 @@ export function InboxPane({ emails, status, focused, height, width }) {
       const dateStr = formatDate(email.receivedAt);
       const fromMax = Math.min(16, Math.floor(innerWidth * 0.25));
       const subjectMax = Math.max(8, innerWidth - fromMax - dateStr.length - 5);
-      return h(Box, { key: email.id },
+      return h(Box, { key: email.id, overflow: 'hidden', flexShrink: 0 },
         h(Text, { color: 'yellow' }, '\u2709 '),
-        h(Text, { bold: true }, truncate(email.subject, subjectMax)),
-        h(Text, { color: 'gray' }, ` ${truncate(email.from, fromMax)} ${dateStr}`)
+        h(Text, { bold: true, wrap: 'truncate' }, truncate(email.subject, subjectMax)),
+        h(Text, { color: 'gray', wrap: 'truncate' }, ` ${truncate(email.from, fromMax)} ${dateStr}`)
       );
     });
   }

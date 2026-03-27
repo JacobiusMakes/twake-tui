@@ -76,7 +76,7 @@ export default function App() {
 
   return h(Box, { flexDirection: 'column', width: termWidth, height: termHeight, overflow: 'hidden' },
     // Top row: Chat (60%) + Inbox (40%) side by side
-    h(Box, { flexDirection: 'row', height: topHeight, overflow: 'hidden' },
+    h(Box, { flexDirection: 'row', height: topHeight, width: termWidth, overflow: 'hidden', flexShrink: 0 },
       h(ChatPane, {
         rooms: matrix.rooms,
         status: matrix.status,
@@ -93,7 +93,7 @@ export default function App() {
       })
     ),
     // Bottom row: Drive (full width, fixed height)
-    h(Box, { height: driveHeight, overflow: 'hidden' },
+    h(Box, { height: driveHeight, width: termWidth, overflow: 'hidden', flexShrink: 0 },
       h(DrivePane, {
         files: cozy.files,
         status: cozy.status,

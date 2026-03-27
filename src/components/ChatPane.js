@@ -61,7 +61,7 @@ export function ChatPane({ rooms, status, focused, height, width }) {
       ? h(Text, { color: 'yellow' }, 'connecting...')
       : h(Text, { color: 'red' }, 'disconnected');
 
-  const header = h(Box, null,
+  const header = h(Box, { overflow: 'hidden', flexShrink: 0 },
     h(Text, { bold: true, color: focused ? 'cyan' : 'white' }, 'Chat'),
     h(Text, { color: 'gray' }, ' '),
     headerContent
@@ -79,10 +79,10 @@ export function ChatPane({ rooms, status, focused, height, width }) {
       const senderStr = ` ${msg.sender}`;
       const prefix = `${timeStr}${senderStr}: `;
       const maxBody = Math.max(1, innerWidth - prefix.length);
-      return h(Box, { key: msg.id || i },
-        h(Text, { color: 'gray' }, timeStr),
-        h(Text, { color: 'cyan', bold: true }, senderStr),
-        h(Text, null, `: ${truncate(msg.body, maxBody)}`)
+      return h(Box, { key: msg.id || i, overflow: 'hidden', flexShrink: 0 },
+        h(Text, { color: 'gray', wrap: 'truncate' }, timeStr),
+        h(Text, { color: 'cyan', bold: true, wrap: 'truncate' }, senderStr),
+        h(Text, { wrap: 'truncate' }, `: ${truncate(msg.body, maxBody)}`)
       );
     });
   }

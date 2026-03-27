@@ -45,7 +45,7 @@ export function DrivePane({ files, status, focused, height, width }) {
       ? h(Text, { color: 'yellow' }, 'loading...')
       : h(Text, { color: 'red' }, 'disconnected');
 
-  const header = h(Box, null,
+  const header = h(Box, { overflow: 'hidden', flexShrink: 0 },
     h(Text, { bold: true, color: focused ? 'cyan' : 'white' }, 'Drive'),
     h(Text, { color: 'gray' }, ' '),
     headerStatus
@@ -59,17 +59,17 @@ export function DrivePane({ files, status, focused, height, width }) {
     );
   } else {
     body = rows.map((row, rowIdx) =>
-      h(Box, { key: rowIdx, gap: 2 },
+      h(Box, { key: rowIdx, gap: 2, overflow: 'hidden', flexShrink: 0 },
         ...row.map((file) =>
-          h(Box, { key: file.id, width: itemWidth },
+          h(Box, { key: file.id, width: itemWidth, overflow: 'hidden', flexShrink: 0 },
             file.type === 'directory'
               ? h(React.Fragment, null,
                   h(Text, { color: 'blue' }, '\uD83D\uDCC1 '),
-                  h(Text, { color: 'blue', bold: true }, `${truncate(file.name, nameMaxLen)}/`)
+                  h(Text, { color: 'blue', bold: true, wrap: 'truncate' }, `${truncate(file.name, nameMaxLen)}/`)
                 )
               : h(React.Fragment, null,
                   h(Text, { color: 'white' }, '\uD83D\uDCC4 '),
-                  h(Text, null, truncate(file.name, nameMaxLen))
+                  h(Text, { wrap: 'truncate' }, truncate(file.name, nameMaxLen))
                 )
           )
         )

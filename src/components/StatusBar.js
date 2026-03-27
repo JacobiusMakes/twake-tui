@@ -38,18 +38,18 @@ export function StatusBar({ chatStatus, mailStatus, driveStatus, focusedPane, wi
   const narrow = (width || 80) < 60;
 
   return h(Box, { height: 1, width: '100%', paddingX: 1, overflow: 'hidden', flexShrink: 0 },
-    h(Box, { gap: 1 },
-      h(Text, { bold: true, color: 'cyan' }, 'twake-tui'),
+    h(Box, { gap: 1, overflow: 'hidden', flexShrink: 0 },
+      h(Text, { bold: true, color: 'cyan', wrap: 'truncate' }, 'twake-tui'),
       h(Text, { color: 'gray' }, '|'),
       h(ServiceIndicator, { name: 'Chat', status: chatStatus }),
       h(ServiceIndicator, { name: 'Mail', status: mailStatus }),
       h(ServiceIndicator, { name: 'Drive', status: driveStatus })
     ),
-    !narrow && h(Box, { gap: 1, marginLeft: 1 },
+    !narrow && h(Box, { gap: 1, marginLeft: 1, overflow: 'hidden', flexShrink: 1 },
       h(Text, { color: 'gray' }, '|'),
-      h(Text, { color: 'gray' }, 'Tab: switch'),
-      h(Text, { color: 'gray', dimColor: true }, `[${focusedPane}]`),
-      h(Text, { color: 'gray' }, '| Ctrl+C quit')
+      h(Text, { color: 'gray', wrap: 'truncate' }, 'Tab: switch'),
+      h(Text, { color: 'gray', dimColor: true, wrap: 'truncate' }, `[${focusedPane}]`),
+      h(Text, { color: 'gray', wrap: 'truncate' }, '| Ctrl+C quit')
     )
   );
 }
