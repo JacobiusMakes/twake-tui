@@ -19,7 +19,16 @@ function formatTime(date) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export function ChatPane({ rooms, status, focused, height }) {
+function truncate(str, len) {
+  if (!str) return '';
+  if (len <= 0) return '';
+  return str.length > len ? str.slice(0, len - 1) + '\u2026' : str;
+}
+
+export function ChatPane({ rooms, status, focused, height, width }) {
+  // Inner width: subtract 2 for border + 2 for paddingX
+  const innerWidth = Math.max(10, (width || 40) - 4);
+
   // Merge all messages from all rooms, sort by time, show recent ones
   const allMessages = [];
 
@@ -58,20 +67,24 @@ export function ChatPane({ rooms, status, focused, height }) {
     headerContent
   );
 
-  // Message lines
+  // Message lines — truncate to fit inner width
   let body;
   if (visible.length === 0) {
     body = h(Text, { color: 'gray', dimColor: true },
       status === 'connecting' ? 'Syncing with Matrix...' : 'No messages yet'
     );
   } else {
-    body = visible.map((msg, i) =>
-      h(Box, { key: msg.id || i },
-        h(Text, { color: 'gray' }, `[${formatTime(msg.time)}]`),
-        h(Text, { color: 'cyan', bold: true }, ` ${msg.sender}`),
-        h(Text, null, `: ${msg.body}`)
-      )
-    );
+    body = visible.map((msg, i) => {
+      const timeStr = `[${formatTime(msg.time)}]`;
+      const senderStr = ` ${msg.sender}`;
+      const prefix = `${timeStr}${senderStr}: `;
+      const maxBody = Math.max(1, innerWidth - prefix.length);
+      return h(Box, { key: msg.id || i },
+        h(Text, { color: 'gray' }, timeStr),
+        h(Text, { color: 'cyan', bold: true }, senderStr),
+        h(Text, null, `: ${truncate(msg.body, maxBody)}`)
+      );
+    });
   }
 
   return h(Box, {
@@ -79,7 +92,9 @@ export function ChatPane({ rooms, status, focused, height }) {
     borderStyle: 'single',
     borderColor,
     paddingX: 1,
-    flexGrow: 1,
-    flexBasis: '50%',
+    width,
+    height,
+    overflow: 'hidden',
+    flexShrink: 0,
   }, header, ...(Array.isArray(body) ? body : [body]));
 }

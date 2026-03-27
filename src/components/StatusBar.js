@@ -33,23 +33,23 @@ function ServiceIndicator({ name, status }) {
   );
 }
 
-export function StatusBar({ chatStatus, mailStatus, driveStatus, focusedPane }) {
-  return h(Box, { paddingX: 1, justifyContent: 'space-between' },
+export function StatusBar({ chatStatus, mailStatus, driveStatus, focusedPane, width }) {
+  // Use a fixed width if the terminal is narrow — drop help text to fit
+  const narrow = (width || 80) < 60;
+
+  return h(Box, { height: 1, width: '100%', paddingX: 1, overflow: 'hidden', flexShrink: 0 },
     h(Box, { gap: 1 },
       h(Text, { bold: true, color: 'cyan' }, 'twake-tui'),
-      h(Text, { color: 'gray' }, 'v0.1.0'),
       h(Text, { color: 'gray' }, '|'),
       h(ServiceIndicator, { name: 'Chat', status: chatStatus }),
       h(ServiceIndicator, { name: 'Mail', status: mailStatus }),
       h(ServiceIndicator, { name: 'Drive', status: driveStatus })
     ),
-    h(Box, { gap: 1 },
+    !narrow && h(Box, { gap: 1, marginLeft: 1 },
       h(Text, { color: 'gray' }, '|'),
-      h(Text, { color: 'gray' }, 'Tab: switch pane'),
-      h(Text, { color: 'gray' }, '|'),
+      h(Text, { color: 'gray' }, 'Tab: switch'),
       h(Text, { color: 'gray', dimColor: true }, `[${focusedPane}]`),
-      h(Text, { color: 'gray' }, '|'),
-      h(Text, { color: 'gray' }, 'Ctrl+C quit')
+      h(Text, { color: 'gray' }, '| Ctrl+C quit')
     )
   );
 }

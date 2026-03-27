@@ -29,10 +29,12 @@ const PANES = ['chat', 'inbox', 'drive'];
 export default function App() {
   const { stdout } = useStdout();
   const termHeight = stdout?.rows || 24;
+  const termWidth = stdout?.columns || 80;
 
-  // Top row panes share ~70% of height, drive gets ~25%, status bar gets 1 line
-  const topHeight = Math.floor((termHeight - 4) * 0.7);
-  const bottomHeight = Math.floor((termHeight - 4) * 0.3);
+  // Fixed: status bar = 1 line, drive = 6 lines, rest = top row
+  const statusBarHeight = 1;
+  const driveHeight = 6;
+  const topHeight = Math.max(4, termHeight - driveHeight - statusBarHeight);
 
   const [focusedIdx, setFocusedIdx] = useState(0);
 
@@ -68,37 +70,45 @@ export default function App() {
     );
   }
 
-  return h(Box, { flexDirection: 'column', height: termHeight },
-    // Top row: Chat + Inbox side by side
-    h(Box, { flexDirection: 'row', height: topHeight },
+  // Chat gets 60%, Inbox gets 40% of terminal width
+  const chatWidth = Math.floor(termWidth * 0.6);
+  const inboxWidth = termWidth - chatWidth;
+
+  return h(Box, { flexDirection: 'column', width: termWidth, height: termHeight, overflow: 'hidden' },
+    // Top row: Chat (60%) + Inbox (40%) side by side
+    h(Box, { flexDirection: 'row', height: topHeight, overflow: 'hidden' },
       h(ChatPane, {
         rooms: matrix.rooms,
         status: matrix.status,
         focused: focusedPane === 'chat',
         height: topHeight,
+        width: chatWidth,
       }),
       h(InboxPane, {
         emails: jmap.emails,
         status: jmap.status,
         focused: focusedPane === 'inbox',
         height: topHeight,
+        width: inboxWidth,
       })
     ),
-    // Bottom row: Drive (full width)
-    h(Box, { height: bottomHeight },
+    // Bottom row: Drive (full width, fixed height)
+    h(Box, { height: driveHeight, overflow: 'hidden' },
       h(DrivePane, {
         files: cozy.files,
         status: cozy.status,
         focused: focusedPane === 'drive',
-        height: bottomHeight,
+        height: driveHeight,
+        width: termWidth,
       })
     ),
-    // Status bar
+    // Status bar (exactly 1 line)
     h(StatusBar, {
       chatStatus: matrix.status,
       mailStatus: jmap.status,
       driveStatus: cozy.status,
       focusedPane,
+      width: termWidth,
     })
   );
 }

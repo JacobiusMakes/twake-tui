@@ -30,7 +30,10 @@ function truncate(str, len) {
   return str.length > len ? str.slice(0, len - 1) + '\u2026' : str;
 }
 
-export function InboxPane({ emails, status, focused, height }) {
+export function InboxPane({ emails, status, focused, height, width }) {
+  // Inner width: subtract 2 for border + 2 for paddingX
+  const innerWidth = Math.max(10, (width || 32) - 4);
+
   const availableLines = Math.max(1, (height || 12) - 2);
   const visible = emails.slice(0, availableLines);
 
@@ -56,13 +59,17 @@ export function InboxPane({ emails, status, focused, height }) {
       status === 'connecting' ? 'Fetching emails...' : 'Inbox is empty'
     );
   } else {
-    body = visible.map((email) =>
-      h(Box, { key: email.id },
+    body = visible.map((email) => {
+      // Envelope icon = 2 chars, date ~6 chars, space + from + space = dynamic
+      const dateStr = formatDate(email.receivedAt);
+      const fromMax = Math.min(16, Math.floor(innerWidth * 0.25));
+      const subjectMax = Math.max(8, innerWidth - fromMax - dateStr.length - 5);
+      return h(Box, { key: email.id },
         h(Text, { color: 'yellow' }, '\u2709 '),
-        h(Text, { bold: true }, truncate(email.subject, 28)),
-        h(Text, { color: 'gray' }, ` ${truncate(email.from, 16)} ${formatDate(email.receivedAt)}`)
-      )
-    );
+        h(Text, { bold: true }, truncate(email.subject, subjectMax)),
+        h(Text, { color: 'gray' }, ` ${truncate(email.from, fromMax)} ${dateStr}`)
+      );
+    });
   }
 
   return h(Box, {
@@ -70,7 +77,9 @@ export function InboxPane({ emails, status, focused, height }) {
     borderStyle: 'single',
     borderColor,
     paddingX: 1,
-    flexGrow: 1,
-    flexBasis: '50%',
+    width,
+    height,
+    overflow: 'hidden',
+    flexShrink: 0,
   }, header, ...(Array.isArray(body) ? body : [body]));
 }
